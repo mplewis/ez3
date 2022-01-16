@@ -1,0 +1,9 @@
+{
+  "go.alternateTools": {
+    // "go": "go"
+    // "dlv": "dlv"
+    // "go-outline": "go-outline"
+    // "gopkgs": "gopkgs"
+    // "gopls": "gopls"
+  }
+}
