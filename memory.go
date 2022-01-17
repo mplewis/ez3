@@ -1,4 +1,4 @@
-package main
+package ez3
 
 import (
 	"fmt"
@@ -10,7 +10,17 @@ type MemoryEZ3 struct {
 	storage map[string][]byte
 }
 
-func (e MemoryEZ3) Set(key string, val Serdeable) error {
+// Get retrieves a value from memory.
+func (e MemoryEZ3) Get(key string, dst Serializable) error {
+	data, ok := e.storage[key]
+	if !ok {
+		return fmt.Errorf("key not found: %s", key)
+	}
+	return dst.Deserialize(data)
+}
+
+// Set stores a value in memory.
+func (e MemoryEZ3) Set(key string, val Serializable) error {
 	data, err := val.Serialize()
 	if err != nil {
 		return err
@@ -19,20 +29,13 @@ func (e MemoryEZ3) Set(key string, val Serdeable) error {
 	return nil
 }
 
-func (e MemoryEZ3) Get(key string, dst Serdeable) error {
-	data, ok := e.storage[key]
-	if !ok {
-		return fmt.Errorf("key not found: %s", key)
-	}
-	fmt.Println(string(data))
-	return dst.Deserialize(data)
-}
-
+// Del removes a value from memory.
 func (e MemoryEZ3) Del(key string) error {
 	delete(e.storage, key)
 	return nil
 }
 
+// List lists all keys in memory with the given prefix.
 func (e MemoryEZ3) List(prefix string) ([]string, error) {
 	var keys []string
 	for k := range e.storage {
@@ -43,7 +46,7 @@ func (e MemoryEZ3) List(prefix string) ([]string, error) {
 	return keys, nil
 }
 
-// NewMemory returns a new in-memory EZ3.
+// NewMemory creates a new memory-based EZ3 client.
 func NewMemory() EZ3 {
 	return MemoryEZ3{storage: make(map[string][]byte)}
 }

@@ -1,4 +1,4 @@
-package main
+package ez3
 
 import (
 	"bytes"
@@ -29,10 +29,18 @@ type S3EZ3 struct {
 	client    S3Client
 }
 
-type S3EZ3Args struct {
+// S3Args is the set of arguments for creating a new S3-backed EZ3.
+type S3Args struct {
 	Bucket    string   // Required. The bucket that holds stored data.
 	Namespace string   // Required. The namespace for this instance's keys.
-	Client    S3Client // Optional. If not provided, autoconfigures an S3 client from your environment.
+	Client    S3Client // Optional. If not provided, autoconfigures an AWS S3 client from your environment.
+}
+
+// S3ClientArgs is the set of arguments for creating a new S3 client for use with S3EZ3.
+type S3ClientArgs struct {
+	Endpoint     string // Required. The web endpoint of the S3 service. Usually starts with https://
+	Region       string // Required. The region of the S3 service.
+	UsePathStyle bool   // Optional. If true, the S3 client will use path-style addressing.
 }
 
 // notFoundErr generates a custom error for a missing key.
@@ -58,7 +66,7 @@ func (s *S3EZ3) ns(key string) string {
 }
 
 // Get retrieves a value from S3.
-func (s S3EZ3) Get(key string, dst Serdeable) error {
+func (s S3EZ3) Get(key string, dst Serializable) error {
 	output, err := s.client.GetObject(context.TODO(), &awsS3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(s.ns(key)),
@@ -80,7 +88,7 @@ func (s S3EZ3) Get(key string, dst Serdeable) error {
 }
 
 // Set stores a value in S3.
-func (s S3EZ3) Set(key string, val Serdeable) error {
+func (s S3EZ3) Set(key string, val Serializable) error {
 	data, err := val.Serialize()
 	if err != nil {
 		return err
@@ -125,7 +133,7 @@ func (s S3EZ3) List(prefix string) ([]string, error) {
 }
 
 // NewS3 creates a new S3-based EZ3 client.
-func NewS3(args S3EZ3Args) (EZ3, error) {
+func NewS3(args S3Args) (EZ3, error) {
 	if args.Bucket == "" {
 		return nil, errors.New("bucket not specified")
 	}
@@ -139,6 +147,34 @@ func NewS3(args S3EZ3Args) (EZ3, error) {
 		}
 		args.Client = awsS3.NewFromConfig(cfg)
 	}
+	return S3EZ3{bucket: args.Bucket, namespace: args.Namespace, client: args.Client}, nil
+}
 
-	return S3EZ3{client: args.Client, bucket: args.Bucket, namespace: args.Namespace}, nil
+// NewS3Client creates a new S3 client for use with S3EZ3.
+// This is a helper function for users who want to connect to an S3-compatible cloud that is not AWS.
+func NewS3Client(args S3ClientArgs) (*awsS3.Client, error) {
+	if args.Endpoint == "" {
+		return nil, errors.New("endpoint not specified")
+	}
+	if args.Region == "" {
+		return nil, errors.New("region not specified")
+	}
+	if !strings.HasPrefix(args.Endpoint, "https://") {
+		fmt.Printf("WARNING: S3 endpoint %s does not start with https://. "+
+			"This is usually a mistake.\n", args.Endpoint)
+	}
+	resolver := aws.EndpointResolverWithOptionsFunc(
+		func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+			if service != awsS3.ServiceID {
+				return aws.Endpoint{}, &aws.EndpointNotFoundError{} // fallback
+			}
+			return aws.Endpoint{URL: args.Endpoint, SigningRegion: args.Region}, nil
+		})
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithEndpointResolverWithOptions(resolver))
+	if err != nil {
+		return nil, err
+	}
+	return awsS3.NewFromConfig(cfg, func(o *awsS3.Options) {
+		o.UsePathStyle = args.UsePathStyle
+	}), nil
 }

@@ -1,57 +1,23 @@
-package main
+// Package ez3 provides an interface to persisting structs into a key-value store such as AWS S3.
+package ez3
 
-import (
-	"fmt"
-	"log"
-)
-
-// Serdeable is a serializable data type.
-type Serdeable interface {
-	Serialize() ([]byte, error)
-	Deserialize([]byte) error
-}
-
-// EZ3 is the interface to S3.
+// EZ3 is a persistence interface which supports de/serialization.
 type EZ3 interface {
-	Get(key string, dst Serdeable) error
-	Set(key string, val Serdeable) error
+	// Get retrieves a value from the store.
+	Get(key string, dst Serializable) error
+	// Set stores a value in the store.
+	Set(key string, val Serializable) error
+	// Del removes a value from the store.
 	Del(key string) error
+	// List lists all keys in the store with the given prefix.
 	List(prefix string) (keys []string, err error)
 }
 
-func main() {
-	//e := NewMemory()
-	e, err := NewS3(S3EZ3Args{Bucket: "mplewis-s3kv-test", Namespace: "test"})
-	if err != nil {
-		log.Panic(err)
-	}
-
-	u := User{Name: "John", Email: "john@gmail.com"}
-
-	err = e.Set("user", &u)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	keys, err := e.List("u")
-	if err != nil {
-		log.Panic(err)
-	}
-	fmt.Println(keys)
-
-	var u2 User
-	err = e.Get("user", &u2)
-	if err != nil {
-		log.Panic(err)
-	}
-	fmt.Printf("%+v\n", u2)
-
-	err = e.Del("user")
-	if err != nil {
-		log.Panic(err)
-	}
-
-	var u3 User
-	err = e.Get("user", &u3)
-	fmt.Println(err)
+// Serializable is a data type which supports de/serialization.
+// Any data stored through EZ3 must implement this interface.
+type Serializable interface {
+	// Serialize serializes the struct's data into bytes.
+	Serialize() ([]byte, error)
+	// Deserialize deserializes the given bytes into the struct's data.
+	Deserialize([]byte) error
 }
