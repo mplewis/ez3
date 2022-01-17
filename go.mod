@@ -3,17 +3,23 @@ module github.com/mplewis/ez3
 go 1.18
 
 require (
-	github.com/BurntSushi/toml v0.4.1 // indirect
-	github.com/google/go-cmp v0.5.6 // indirect
-	github.com/sergi/go-diff v1.1.0 // indirect
-	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211019181941-9d821ace8654 // indirect
-	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.9-0.20220114174702-f29bdf1b5054 // indirect
-	golang.org/x/tools/gopls v0.0.0-20220114174702-f29bdf1b5054 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.13.0
+	github.com/aws/aws-sdk-go-v2/config v1.13.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.24.0
+)
+
+require (
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.2.0 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.10.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.4 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.2.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.7.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.7.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.11.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.9.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.14.0 // indirect
+	github.com/aws/smithy-go v1.10.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	honnef.co/go/tools v0.3.0-0.dev.0.20220115023254-84c813bdeba1 // indirect
-	mvdan.cc/gofumpt v0.1.1 // indirect
-	mvdan.cc/xurls/v2 v2.3.0 // indirect
 )

@@ -20,10 +20,15 @@ type EZ3 interface {
 }
 
 func main() {
-	e := NewMemory()
+	//e := NewMemory()
+	e, err := NewS3()
+	if err != nil {
+		log.Panic(err)
+	}
+
 	u := User{Name: "John", Email: "john@gmail.com"}
 
-	err := e.Set("user", &u)
+	err = e.Set("user", &u)
 	if err != nil {
 		log.Panic(err)
 	}
