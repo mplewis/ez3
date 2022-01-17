@@ -21,7 +21,7 @@ type EZ3 interface {
 
 func main() {
 	//e := NewMemory()
-	e, err := NewS3()
+	e, err := NewS3(S3EZ3Args{Bucket: "mplewis-s3kv-test", Namespace: "test"})
 	if err != nil {
 		log.Panic(err)
 	}
