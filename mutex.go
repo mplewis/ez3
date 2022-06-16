@@ -19,11 +19,13 @@ func NewMutex(ez3 *EZ3, redisClient *redis.Client) Mutex {
 	return Mutex{ez3: ez3, redsync: rs}
 }
 
-func (m Mutex) Get(key string, dst Serializable) error {
+// Get retrieves a value from the store.
+func (m *Mutex) Get(key string, dst Serializable) error {
 	return (*m.ez3).Get(key, dst)
 }
 
-func (m Mutex) Set(key string, val Serializable) error {
+// Set stores a value in the store.
+func (m *Mutex) Set(key string, val Serializable) error {
 	mx := m.redsync.NewMutex(key)
 	if err := mx.Lock(); err != nil {
 		return err
@@ -32,7 +34,8 @@ func (m Mutex) Set(key string, val Serializable) error {
 	return (*m.ez3).Set(key, val)
 }
 
-func (m Mutex) Del(key string) error {
+// Del removes a value from the store.
+func (m *Mutex) Del(key string) error {
 	mx := m.redsync.NewMutex(key)
 	if err := mx.Lock(); err != nil {
 		return err
@@ -41,6 +44,7 @@ func (m Mutex) Del(key string) error {
 	return (*m.ez3).Del(key)
 }
 
-func (m Mutex) List(prefix string) (keys []string, err error) {
+// List lists all keys in the store with the given prefix.
+func (m *Mutex) List(prefix string) (keys []string, err error) {
 	return (*m.ez3).List(prefix)
 }
