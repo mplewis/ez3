@@ -1,6 +1,8 @@
 // Package ez3 provides an interface to persisting structs into a key-value store such as AWS S3.
 package ez3
 
+import "errors"
+
 // EZ3 is a persistence interface which supports de/serialization.
 type EZ3 interface {
 	// Get retrieves a value from the store.
@@ -21,3 +23,6 @@ type Serializable interface {
 	// Deserialize deserializes the given bytes into the struct's data.
 	Deserialize([]byte) error
 }
+
+// KeyNotFound is the error returned when a key is not found in the store.
+var KeyNotFound = errors.New("key not found in ez3 store")

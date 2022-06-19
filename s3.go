@@ -5,10 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	awsS3 "github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/smithy-go"
 	"io/ioutil"
 	"strings"
+
+	awsS3 "github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -43,11 +44,6 @@ type S3ClientArgs struct {
 	UsePathStyle bool   // Optional. If true, the S3 client will use path-style addressing.
 }
 
-// notFoundErr generates a custom error for a missing key.
-func notFoundErr(key string) error {
-	return fmt.Errorf("key not found: %s", key)
-}
-
 // wasNotFound returns true if the error represents an S3 "not found" error.
 func wasNotFound(err error) bool {
 	if err == nil {
@@ -75,7 +71,7 @@ func (s S3EZ3) Get(key string, dst Serializable) error {
 	if err != nil {
 		var ae smithy.APIError
 		if errors.As(err, &ae) && ae.ErrorCode() == "NoSuchKey" {
-			return notFoundErr(key)
+			return KeyNotFound
 		}
 		return err
 	}

@@ -1,7 +1,6 @@
 package ez3
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -14,7 +13,7 @@ type MemoryEZ3 struct {
 func (e MemoryEZ3) Get(key string, dst Serializable) error {
 	data, ok := e.storage[key]
 	if !ok {
-		return fmt.Errorf("key not found: %s", key)
+		return KeyNotFound
 	}
 	return dst.Deserialize(data)
 }
