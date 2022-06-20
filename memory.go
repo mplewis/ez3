@@ -6,12 +6,12 @@ import (
 
 // MemoryEZ3 is an in-memory implementation of the EZ3 API.
 type MemoryEZ3 struct {
-	storage map[string][]byte
+	Storage map[string][]byte
 }
 
 // Get retrieves a value from memory.
 func (e MemoryEZ3) Get(key string, dst Serializable) error {
-	data, ok := e.storage[key]
+	data, ok := e.Storage[key]
 	if !ok {
 		return KeyNotFound
 	}
@@ -24,20 +24,20 @@ func (e MemoryEZ3) Set(key string, val Serializable) error {
 	if err != nil {
 		return err
 	}
-	e.storage[key] = data
+	e.Storage[key] = data
 	return nil
 }
 
 // Del removes a value from memory.
 func (e MemoryEZ3) Del(key string) error {
-	delete(e.storage, key)
+	delete(e.Storage, key)
 	return nil
 }
 
 // List lists all keys in memory with the given prefix.
 func (e MemoryEZ3) List(prefix string) ([]string, error) {
 	var keys []string
-	for k := range e.storage {
+	for k := range e.Storage {
 		if strings.HasPrefix(k, prefix) {
 			keys = append(keys, k)
 		}
@@ -47,5 +47,5 @@ func (e MemoryEZ3) List(prefix string) ([]string, error) {
 
 // NewMemory creates a new memory-based EZ3 client.
 func NewMemory() EZ3 {
-	return MemoryEZ3{storage: make(map[string][]byte)}
+	return MemoryEZ3{Storage: make(map[string][]byte)}
 }
