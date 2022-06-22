@@ -46,6 +46,6 @@ func (e MemoryEZ3) List(prefix string) ([]string, error) {
 }
 
 // NewMemory creates a new memory-based EZ3 client.
-func NewMemory() EZ3 {
+func NewMemory() MemoryEZ3 {
 	return MemoryEZ3{Storage: make(map[string][]byte)}
 }
